@@ -26,6 +26,7 @@ $routes = [
     ],
     'PUT' => [
         // TODO: 他のエンドポイントを追加
+        '#^/todos/(\d+)$#' => 'handleUpdateTodo',
     ],
     'DELETE' => [
         // TODO: 他のエンドポイントを追加
@@ -185,6 +186,93 @@ function handleCreateTodo(PDO $pdo): void
         echo json_encode([
             'status' => 'error',
             'message' => 'Failed to create todos',
+            'error' => $e->getMessage()
+        ]);
+    }
+    exit;
+}
+
+/**
+ * `/todos` のTodoを更新するエンドポイント
+ *
+ * @param PDO $pdo データベース接続のためのPDOインスタンス
+ * @return void
+ */
+function handleUpdateTodo(PDO $pdo, int $id): void
+{
+    try {
+        // リクエストボディをJSON形式で受け取る
+        $input = json_decode(file_get_contents('php://input'), true);
+
+        // バリデーション: `title` または `completed` が指定されているか確認
+        if (!isset($input['title']) && !isset($input['completed'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Either title or completed is required']);
+            exit;
+        }
+
+        // 更新内容を設定
+        $updateFields = [];
+        $params = [':id' => $id];
+
+        if (isset($input['title']) && !empty(trim($input['title']))) {
+            $updateFields[] = 'title = :title';
+            $params[':title'] = trim($input['title']);
+        }
+
+        if (isset($input['completed'])) {
+            $completed = (int)$input['completed'];
+
+            // `completed` の値を `status_id` にマッピング
+            $statusMap = [
+                1 => 1, // 未完了 (Not Completed)
+                2 => 2, // 進行中 (In Progress)
+                3 => 3  // 完了 (Completed)
+            ];
+
+            // 指定された `completed` が 1, 2, 3 以外の場合はエラー
+            if (!array_key_exists($completed, $statusMap)) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Invalid completed value']);
+                exit;
+            }
+            
+            $updateFields[] = 'status_id = :status_id';
+            $params[':status_id'] = $statusMap[$completed];
+        }
+
+        if (empty($updateFields)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'No valid fields to update']);
+            exit;
+        }
+
+        // SQLクエリを組み立てて更新処理を実行
+        $sql = "UPDATE todos SET " . implode(', ', $updateFields) . " WHERE id = :id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+
+        // 更新後のデータを取得
+        $stmt = $pdo->prepare("SELECT todos.id, todos.title, statuses.name FROM todos JOIN statuses ON todos.status_id = statuses.id WHERE todos.id = :id");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        $todo = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($todo) {
+            // 成功時のレスポンス
+            http_response_code(200);
+            echo json_encode(['status' => 'ok', 'data' => $todo]);
+        } else {
+            // Todoが見つからなかった場合 (HTTP 404)
+            http_response_code(404);
+            echo json_encode(['error' => 'Todoが見つかりません']);
+        }
+    } catch (Exception $e) {
+        // クエリエラー時のレスポンス
+        http_response_code(500);
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Failed to update todo',
             'error' => $e->getMessage()
         ]);
     }
