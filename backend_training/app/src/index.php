@@ -22,6 +22,7 @@ $routes = [
     ],
     'POST' => [
         // TODO: 他のエンドポイントを追加
+        '#^/todos$#' => 'handleCreateTodo',
     ],
     'PUT' => [
         // TODO: 他のエンドポイントを追加
@@ -134,6 +135,56 @@ function handleGetTodoById(PDO $pdo, int $id): void
         echo json_encode([
             'status' => 'error',
             'message' => 'Failed to get todos',
+            'error' => $e->getMessage()
+        ]);
+    }
+    exit;
+}
+
+/**
+ * `/todos/` エンドポイントを処理します。
+ *
+ * @param PDO $pdo データベース接続のためのPDOインスタンス
+ * @return void
+ */
+function handleCreateTodo(PDO $pdo): void
+{
+    try {
+        // リクエストボディをJSON形式で受け取る
+        $input = json_decode(file_get_contents('php://input'), true);
+
+        // バリデーション: `title` が空の場合はエラー
+        if (empty($input['title'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Title is required']);
+            exit;
+        }
+
+        $title = trim($input['title']);
+
+        // 新しいTodoをデータベースに挿入
+        $stmt = $pdo->prepare("INSERT INTO todos (title, status_id) VALUES (:title, 1)");
+        $stmt->bindParam(':title', $title, PDO::PARAM_STR);
+        $stmt->execute();
+
+        // 挿入したレコードのIDを取得
+        $id = $pdo->lastInsertId();
+
+        // 作成されたTodoを取得
+        $stmt = $pdo->prepare("SELECT todos.id, todos.title, statuses.name FROM todos JOIN statuses ON todos.status_id = statuses.id WHERE todos.id = :id");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        $todo = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // レスポンス (HTTP 201)
+        http_response_code(201);
+        echo json_encode(['status' => 'ok', 'data' => $todo]);
+    } catch (Exception $e) {
+        // クエリエラー時のレスポンス
+        http_response_code(500);
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Failed to create todos',
             'error' => $e->getMessage()
         ]);
     }
