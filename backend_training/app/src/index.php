@@ -30,6 +30,7 @@ $routes = [
     ],
     'DELETE' => [
         // TODO: 他のエンドポイントを追加
+        '#^/todos\?id=(\d+)$#' => 'handleDeleteTodo',
     ]
 ];
 
@@ -273,6 +274,60 @@ function handleUpdateTodo(PDO $pdo, int $id): void
         echo json_encode([
             'status' => 'error',
             'message' => 'Failed to update todo',
+            'error' => $e->getMessage()
+        ]);
+    }
+    exit;
+}
+
+/**
+ * `/todos?id={id}` のTodoを削除するエンドポイント
+ *
+ * @param PDO $pdo データベース接続のためのPDOインスタンス
+ * @return void
+ */
+function handleDeleteTodo(PDO $pdo): void
+{
+    try {
+        // クエリパラメータから `id` を取得
+        if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'ID is required and must be a number']);
+            exit;
+        }
+        $id = (int)$_GET['id'];
+
+        // 削除対象のTodoを取得
+        $stmt = $pdo->prepare("SELECT todos.id, todos.title, statuses.name FROM todos JOIN statuses ON todos.status_id = statuses.id WHERE todos.id = :id");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        $todo = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$todo) {
+            // Todoが見つからなかった場合 (HTTP 404)
+            http_response_code(404);
+            echo json_encode(['error' => 'Todoが見つかりません']);
+            exit;
+        }
+
+        // Todoを削除
+        $stmt = $pdo->prepare("DELETE FROM todos WHERE id = :id");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        // 削除成功時のレスポンス
+        http_response_code(200);
+        echo json_encode([
+            'status' => 'ok',
+            'message' => 'Todo deleted successfully',
+            'deleted_todo' => $todo
+        ]);
+    } catch (Exception $e) {
+        // クエリエラー時のレスポンス
+        http_response_code(500);
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Failed to delete todo',
             'error' => $e->getMessage()
         ]);
     }
