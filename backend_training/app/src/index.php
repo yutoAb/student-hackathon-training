@@ -18,6 +18,7 @@ $routes = [
         '#^/todos$#' => 'handleGetTodos',  // Match only `/todos` with no query params or other path
         '#^/health$#' => 'handleHealthCheck',
         // TODO: 他のエンドポイントを追加
+        '#^/todos/(\d+)$#' => 'handleGetTodoById',
     ],
     'POST' => [
         // TODO: 他のエンドポイントを追加
@@ -91,6 +92,42 @@ function handleGetTodos(PDO $pdo): void
 
         // レスポンスを返却
         echo json_encode(['status' => 'ok', 'data' => $result]);
+    } catch (Exception $e) {
+        // クエリエラー時のレスポンス
+        http_response_code(500);
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Failed to get todos',
+            'error' => $e->getMessage()
+        ]);
+    }
+    exit;
+}
+
+/**
+ * `/todos/{id}` エンドポイントを処理します。
+ *
+ * @param PDO $pdo データベース接続のためのPDOインスタンス
+ * @return void
+ */
+function handleGetTodoById(PDO $pdo, int $id): void
+{
+    try {
+        // データベースからTodoリストを取得
+        $stmt = $pdo->prepare("SELECT todos.id, todos.title, statuses.name FROM todos JOIN statuses ON todos.status_id = statuses.id WHERE todos.id = :id;");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $todo = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($todo) {
+            // Todoが見つかった場合
+            echo json_encode(['status' => 'ok', 'data' => $todo]);
+        } else {
+            // Todoが見つからなかった場合 (HTTP 404)
+            http_response_code(404);
+            echo json_encode(['error' => 'Todoが見つかりません']);
+        }
     } catch (Exception $e) {
         // クエリエラー時のレスポンス
         http_response_code(500);
