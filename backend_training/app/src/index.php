@@ -226,8 +226,8 @@ function handleUpdateTodo(PDO $pdo, int $id): void
             // `completed` の値を `status_id` にマッピング
             $statusMap = [
                 1 => 1, // 未完了 (Not Completed)
-                2 => 2, // 進行中 (In Progress)
-                3 => 3  // 完了 (Completed)
+                2 => 2, // 完了 (Completed)
+                3 => 3  // 進行中 (In Progress)
             ];
 
             // 指定された `completed` が 1, 2, 3 以外の場合はエラー
@@ -236,7 +236,7 @@ function handleUpdateTodo(PDO $pdo, int $id): void
                 echo json_encode(['error' => 'Invalid completed value']);
                 exit;
             }
-            
+
             $updateFields[] = 'status_id = :status_id';
             $params[':status_id'] = $statusMap[$completed];
         }
