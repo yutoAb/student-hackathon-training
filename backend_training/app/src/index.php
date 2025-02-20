@@ -26,7 +26,7 @@ $routes = [
     ],
     'PUT' => [
         // TODO: 他のエンドポイントを追加
-        '#^/todos/(\d+)$#' => 'handleUpdateTodo',
+        '#^/todos\?id=(\d+)$#' => 'handleUpdateTodo',
     ],
     'DELETE' => [
         // TODO: 他のエンドポイントを追加
@@ -199,9 +199,17 @@ function handleCreateTodo(PDO $pdo): void
  * @param PDO $pdo データベース接続のためのPDOインスタンス
  * @return void
  */
-function handleUpdateTodo(PDO $pdo, int $id): void
+function handleUpdateTodo(PDO $pdo): void
 {
     try {
+        // クエリパラメータから `id` を取得
+        if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'ID is required and must be a number']);
+            exit;
+        }
+        $id = (int)$_GET['id'];
+        
         // リクエストボディをJSON形式で受け取る
         $input = json_decode(file_get_contents('php://input'), true);
 
