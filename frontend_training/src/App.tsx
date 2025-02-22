@@ -1,16 +1,32 @@
 import { useState } from "react";
 import "./App.css";
+import { v4 as uuid } from "uuid";
+
+type Todo = {
+  id: string;
+  text: string;
+  isComplete: boolean;
+};
 
 function App() {
-  const [listTodo, setListTodo] = useState<string[]>([]);
+  const [listTodo, setListTodo] = useState<Todo[]>([]);
   const [todo, setTodo] = useState<string>("");
 
   const addTodo = () => {
     if (todo.trim() !== "") {
-      setListTodo([...listTodo, todo]);
+      setListTodo([...listTodo, { id: uuid(), text: todo, isComplete: false }]);
       setTodo("");
     }
   };
+
+  const completeTodo = (id: string) => {
+    setListTodo(
+      listTodo.map((item) =>
+        item.id === id ? { ...item, isComplete: true } : item
+      )
+    );
+  };
+
   return (
     <>
       <h1>TODOアプリ</h1>
@@ -23,9 +39,14 @@ function App() {
         <button onClick={addTodo}>追加</button>
       </div>
       <ul>
-        {listTodo.map((item, index) => (
-          <li key={index}>{item}</li>
-        ))}
+        {listTodo
+          .filter((item) => !item.isComplete)
+          .map((item) => (
+            <div className="container" key={item.id}>
+              <li>{item.text}</li>
+              <button onClick={() => completeTodo(item.id)}>完了</button>
+            </div>
+          ))}
       </ul>
     </>
   );
