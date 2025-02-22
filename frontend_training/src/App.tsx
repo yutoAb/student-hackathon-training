@@ -11,7 +11,6 @@ function App() {
       setTodo('')
     }
   }
-
   return (
     <>
       <h1>TODOアプリ</h1>
@@ -28,7 +27,7 @@ function App() {
         ))}
       </ul>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
