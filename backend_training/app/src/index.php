@@ -173,14 +173,14 @@ function handleCreateTodo(PDO $pdo): void
         $id = $pdo->lastInsertId();
 
         // 作成されたTodoを取得
-        $stmt = $pdo->prepare("SELECT todos.id, todos.title, statuses.name FROM todos JOIN statuses ON todos.status_id = statuses.id WHERE todos.id = :id");
+        $stmt = $pdo->prepare("SELECT todos.id, todos.title, statuses.name AS status FROM todos JOIN statuses ON todos.status_id = statuses.id WHERE todos.id = :id");
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
         $todo = $stmt->fetch(PDO::FETCH_ASSOC);
 
         // レスポンス (HTTP 201)
         http_response_code(201);
-        echo json_encode(['status' => 'ok', 'data' => $todo]);
+        echo json_encode(['status' => 'ok', 'data' => [$todo]]);
     } catch (Exception $e) {
         // クエリエラー時のレスポンス
         http_response_code(500);
@@ -262,7 +262,7 @@ function handleUpdateTodo(PDO $pdo): void
         $stmt->execute($params);
 
         // 更新後のデータを取得
-        $stmt = $pdo->prepare("SELECT todos.id, todos.title, statuses.name FROM todos JOIN statuses ON todos.status_id = statuses.id WHERE todos.id = :id");
+        $stmt = $pdo->prepare("SELECT todos.id, todos.title, statuses.name AS status FROM todos JOIN statuses ON todos.status_id = statuses.id WHERE todos.id = :id");
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
         $todo = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -270,7 +270,7 @@ function handleUpdateTodo(PDO $pdo): void
         if ($todo) {
             // 成功時のレスポンス
             http_response_code(200);
-            echo json_encode(['status' => 'ok', 'data' => $todo]);
+            echo json_encode(['status' => 'ok', 'data' => [$todo]]);
         } else {
             // Todoが見つからなかった場合 (HTTP 404)
             http_response_code(404);
@@ -306,7 +306,7 @@ function handleDeleteTodo(PDO $pdo): void
         $id = (int)$_GET['id'];
 
         // 削除対象のTodoを取得
-        $stmt = $pdo->prepare("SELECT todos.id, todos.title, statuses.name FROM todos JOIN statuses ON todos.status_id = statuses.id WHERE todos.id = :id");
+        $stmt = $pdo->prepare("SELECT todos.id, todos.title, statuses.name AS status FROM todos JOIN statuses ON todos.status_id = statuses.id WHERE todos.id = :id");
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
         $todo = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -327,8 +327,8 @@ function handleDeleteTodo(PDO $pdo): void
         http_response_code(200);
         echo json_encode([
             'status' => 'ok',
-            'message' => 'Todo deleted successfully',
-            'deleted_todo' => $todo
+            // 'message' => 'Todo deleted successfully',
+            'data' => [$todo]
         ]);
     } catch (Exception $e) {
         // クエリエラー時のレスポンス
