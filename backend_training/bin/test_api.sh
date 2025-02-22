@@ -134,7 +134,7 @@ test_get_server_error() {
 # Function to display menu and execute selected test case
 menu() {
     PS3="Please select a test case to run: "
-    options=("Test GET /todos" "Test GET /todos/1" "Test GET /todos?id=9999" "Test POST /todos" "Test PUT/todos?id=1" "Test DELETE /todos?id=1" "Test GET /todos/cause-error" "Run All Tests" "Exit")
+    options=("Test GET /todos" "Test GET /todos/1" "Test GET /todos/9999" "Test POST /todos" "Test PUT /todos?id=1" "Test DELETE /todos?id=1" "Test GET /todos/cause-error" "Run All Tests" "Exit")
     select opt in "${options[@]}"
     do
         case $opt in
@@ -144,7 +144,7 @@ menu() {
             "Test GET /todos/1")
                 test_get_todo_by_id
                 ;;
-            "Test GET /todos/9999 Not Found")
+            "Test GET /todos/9999")
                 test_get_todo_not_found
                 ;;
             "Test POST /todos")
