@@ -1,7 +1,6 @@
-import './App.css'
+import "./App.css";
 
 function App() {
-
   return (
     <>
       <h1>TODOアプリ</h1>
@@ -10,7 +9,7 @@ function App() {
         <button>追加</button>
       </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
