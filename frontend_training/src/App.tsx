@@ -13,6 +13,7 @@ export type Todo = {
 function App() {
   const [listTodo, setListTodo] = useState<Todo[]>([]);
   const [todo, setTodo] = useState<string>("");
+  console.log(listTodo);
 
   const addTodo = () => {
     if (todo.trim() !== "") {
@@ -76,7 +77,7 @@ function App() {
                 <li onClick={() => editTodo(item.id)}>{item.text}</li>
                 <button onClick={() => completeTodo(item.id)}>完了</button>
               </div>
-              {item.isEdit ?? (
+              {item.isEdit && (
                 <EditTodo
                   todo={item}
                   updateTodo={updateTodo}
