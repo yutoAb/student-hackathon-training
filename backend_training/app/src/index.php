@@ -117,7 +117,7 @@ function handleGetTodoById(PDO $pdo, int $id): void
 {
     try {
         // データベースからTodoリストを取得
-        $stmt = $pdo->prepare("SELECT todos.id, todos.title, statuses.name FROM todos JOIN statuses ON todos.status_id = statuses.id WHERE todos.id = :id;");
+        $stmt = $pdo->prepare("SELECT todos.id, todos.title, statuses.name AS status FROM todos JOIN statuses ON todos.status_id = statuses.id WHERE todos.id = :id;");
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
 
@@ -125,7 +125,7 @@ function handleGetTodoById(PDO $pdo, int $id): void
 
         if ($todo) {
             // Todoが見つかった場合
-            echo json_encode(['status' => 'ok', 'data' => $todo]);
+            echo json_encode(['status' => 'ok', 'data' => [$todo]]);
         } else {
             // Todoが見つからなかった場合 (HTTP 404)
             http_response_code(404);
@@ -209,7 +209,7 @@ function handleUpdateTodo(PDO $pdo): void
             exit;
         }
         $id = (int)$_GET['id'];
-        
+
         // リクエストボディをJSON形式で受け取る
         $input = json_decode(file_get_contents('php://input'), true);
 
