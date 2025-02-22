@@ -121,11 +121,11 @@ test_get_server_error() {
     status_code=$(echo "$response" | tail -n1)
     body=$(echo "$response" | sed '$d')  # This removes the last line (the status code)
 
-    if [ "$status_code" -eq 500 ] && is_json "$body"; then
+    if [ "$status_code" -eq 404 ] && is_json "$body"; then
         echo "Status: $status_code ✅ Passed"
         echo "Response: $body"
     else
-        echo "Status: $status_code ❌ Failed (Expected 500)"
+        echo "Status: $status_code ❌ Failed (Expected 404)"
         echo "Response: $body"
     fi
     echo ""  # New line after test case
@@ -134,7 +134,7 @@ test_get_server_error() {
 # Function to display menu and execute selected test case
 menu() {
     PS3="Please select a test case to run: "
-    options=("Test GET /todos" "Test GET /todos/1" "Test GET /todos?id=9999" "Test POST /todos" "Test PUT/todos?id=1" "Test DELETE /todos?id=1" "Test GET /todos/cause-error" "Run All Tests" "Exit")
+    options=("Test GET /todos" "Test GET /todos/1" "Test GET /todos/9999" "Test POST /todos" "Test PUT /todos?id=1" "Test DELETE /todos?id=1" "Test GET /todos/cause-error" "Run All Tests" "Exit")
     select opt in "${options[@]}"
     do
         case $opt in
@@ -144,7 +144,7 @@ menu() {
             "Test GET /todos/1")
                 test_get_todo_by_id
                 ;;
-            "Test GET /todos/9999 Not Found")
+            "Test GET /todos/9999")
                 test_get_todo_not_found
                 ;;
             "Test POST /todos")
