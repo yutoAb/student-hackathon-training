@@ -1,16 +1,16 @@
-import { useState } from 'react'
-import './App.css'
+import { useState } from "react";
+import "./App.css";
 
 function App() {
-  const [listTodo, setListTodo] = useState<string[]>([])
-  const [todo, setTodo] = useState<string>('')
+  const [listTodo, setListTodo] = useState<string[]>([]);
+  const [todo, setTodo] = useState<string>("");
 
   const addTodo = () => {
-    if (todo.trim() !== '') {
-      setListTodo([...listTodo, todo])
-      setTodo('')
+    if (todo.trim() !== "") {
+      setListTodo([...listTodo, todo]);
+      setTodo("");
     }
-  }
+  };
   return (
     <>
       <h1>TODOアプリ</h1>
@@ -18,7 +18,8 @@ function App() {
         <input
           value={todo}
           onChange={(e) => setTodo(e.target.value)}
-          placeholder="TODOを入力" />
+          placeholder="TODOを入力"
+        />
         <button onClick={addTodo}>追加</button>
       </div>
       <ul>
