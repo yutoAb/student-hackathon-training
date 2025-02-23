@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./App.css";
 import { v4 as uuid } from "uuid";
 import { EditTodo } from "./EditTodo";
+import { useList } from "./hooks/useList";
 
 export type Todo = {
   id: string;
@@ -13,6 +14,9 @@ export type Todo = {
 function App() {
   const [listTodo, setListTodo] = useState<Todo[]>([]);
   const [todo, setTodo] = useState<string>("");
+
+  const list = useList();
+  console.log(list);
 
   const addTodo = () => {
     if (todo.trim() !== "") {
