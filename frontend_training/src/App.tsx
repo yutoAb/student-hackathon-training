@@ -81,8 +81,7 @@ function App() {
           <div key={item.id}>
             <div className="container">
               <div className="container" onClick={() => editTodo(item.id)}>
-                <li>{item.title}</li>
-                <div>{convertNameToJa(item.name)}</div>
+                <li>{item.title}</li>：<div>{convertNameToJa(item.name)}</div>
               </div>
               <button onClick={() => completeTodo(item.id)}>削除</button>
             </div>
