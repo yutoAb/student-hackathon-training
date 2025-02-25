@@ -31,6 +31,9 @@ $routes = [
     'DELETE' => [
         // TODO: 他のエンドポイントを追加
         '#^/todos\?id=(\d+)$#' => 'handleDeleteTodo',
+    ],
+    'OPTIONS' => [
+        '#^.*$#' => 'handleOptions'
     ]
 ];
 
@@ -339,5 +342,18 @@ function handleDeleteTodo(PDO $pdo): void
             'error' => $e->getMessage()
         ]);
     }
+    exit;
+}
+
+/**
+ * OPTIONS リクエストを処理する
+ * CORSヘッダーを設定して 200 OK レスポンスを返す
+ *
+ * @return void
+ */
+function handleOptions(): void
+{
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization');
     exit;
 }
