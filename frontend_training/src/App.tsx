@@ -1,6 +1,5 @@
 import { useState } from "react";
 import "./App.css";
-// import { v4 as uuid } from "uuid";
 import { EditTodo } from "./EditTodo";
 import { useList } from "./hooks/useList";
 import { useCreateTodo } from "./hooks/useCreateTodo";
