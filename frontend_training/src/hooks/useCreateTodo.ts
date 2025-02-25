@@ -1,4 +1,4 @@
-// import mutate from "swr";
+import { mutate } from "swr";
 import { API_URL } from "../App";
 import { Todo } from "../App";
 
@@ -18,7 +18,7 @@ export function useCreateTodo() {
 
     const result = await response.json();
 
-    // mutate(API_URL);
+    mutate(API_URL);
 
     return result;
   }
