@@ -80,8 +80,10 @@ function App() {
         {listTodo?.map((item) => (
           <div key={item.id}>
             <div className="container">
-              <li onClick={() => editTodo(item.id)}>{item.title}</li>
-              <div>{convertNameToJa(item.name)}</div>
+              <div className="container" onClick={() => editTodo(item.id)}>
+                <li>{item.title}</li>
+                <div>{convertNameToJa(item.name)}</div>
+              </div>
               <button onClick={() => completeTodo(item.id)}>削除</button>
             </div>
             {editingTodos[item.id] && (
