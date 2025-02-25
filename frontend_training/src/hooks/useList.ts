@@ -1,8 +1,9 @@
 import useSWR from "swr";
+import { Todo } from "../App";
 
 type jsonData = {
   status: string;
-  data: [];
+  data: Todo[];
 };
 
 async function fetcher(key: string) {
@@ -12,5 +13,5 @@ async function fetcher(key: string) {
 export function useList() {
   const url = "http://localhost/todos";
   const { data } = useSWR<jsonData>(url, fetcher);
-  return data;
+  return data?.data;
 }
