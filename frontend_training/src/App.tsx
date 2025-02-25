@@ -48,12 +48,12 @@ function App() {
   const updateTodoDetails = async (
     id: string,
     newTitle: string,
-    name: name
+    newName: name
   ) => {
     try {
       await updateTodo(id, {
         title: newTitle,
-        completed: convertNameToCompleted(name),
+        completed: convertNameToCompleted(newName),
       });
       setEditingTodos((prev) => ({ ...prev, [id]: false }));
     } catch (error) {
