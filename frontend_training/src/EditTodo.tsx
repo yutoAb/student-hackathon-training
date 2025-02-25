@@ -1,17 +1,18 @@
 import { useState } from "react";
 import { Todo } from "./App";
+import { name } from "./App";
 
 type EditTodoProps = {
   todo: Todo;
-  updateTodo: (id: string, newText: string) => void;
+  updateTodoDetails: (id: string, newText: string, name: name) => void;
   cancelEdit: (id: string) => void;
 };
 export const EditTodo: React.FC<EditTodoProps> = ({
   todo,
-  updateTodo,
+  updateTodoDetails,
   cancelEdit,
 }: EditTodoProps) => {
-  const [editText, setEditText] = useState(todo.text);
+  const [editText, setEditText] = useState(todo.title);
 
   return (
     <div className="container">
@@ -20,7 +21,7 @@ export const EditTodo: React.FC<EditTodoProps> = ({
         onChange={(e) => setEditText(e.target.value)}
         placeholder="TODOを編集"
       />
-      <button onClick={() => updateTodo(todo.id, editText)}>更新</button>
+      <button onClick={() => updateTodoDetails(todo.id, editText,todo.name)}>更新</button>
       <button onClick={() => cancelEdit(todo.id)}>キャンセル</button>
     </div>
   );

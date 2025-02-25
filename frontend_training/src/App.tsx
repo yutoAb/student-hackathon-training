@@ -5,8 +5,10 @@ import { EditTodo } from "./EditTodo";
 import { useList } from "./hooks/useList";
 import { useCreateTodo } from "./hooks/useCreateTodo";
 import { useDeleteTodo } from "./hooks/useDeleteTodo";
+import { useUpdateTodo } from "./hooks/useUpdateTodo";
+import { convertNameToCompleted } from "./utils/convertNameToCompleted";
 
-type name = `pending` | `completed` | `active`;
+export type name = `pending` | `completed` | `active`;
 
 export const API_URL = "http://localhost/todos";
 
@@ -24,6 +26,12 @@ function App() {
   const listTodo = useList();
   const { createTodo } = useCreateTodo();
   const { deleteTodo } = useDeleteTodo();
+  const { updateTodo } = useUpdateTodo();
+
+  // 編集状態を管理する state
+  const [editingTodos, setEditingTodos] = useState<{ [key: string]: boolean }>(
+    {}
+  );
 
   const addTodo = async () => {
     if (todo.trim() !== "") {
@@ -45,31 +53,23 @@ function App() {
   };
 
   const editTodo = (id: string) => {
-    console.log(id);
-    // setListTodo(
-    //   listTodo.map((item) =>
-    //     item.id === id ? { ...item, isEdit: true } : item
-    //   )
-    // );
+    setEditingTodos((prev) => ({ ...prev, [id]: true }));
   };
 
-  const updateTodo = (id: string, newTitle: string) => {
-    console.log(id);
-    console.log(newTitle);
-    // setListTodo(
-    //   listTodo.map((item) =>
-    //     item.id === id ? { ...item, title: newTitle, isEdit: false } : item
-    //   )
-    // );
+  const updateTodoDetails = async (id: string, newTitle: string, name: name) => {
+    try {
+      await updateTodo(id, {
+        title: newTitle,
+        completed: convertNameToCompleted(name),
+      });
+      setEditingTodos((prev) => ({ ...prev, [id]: false }));
+    } catch (error) {
+      console.error("Todo の更新に失敗しました", error);
+    }
   };
 
   const cancelEdit = (id: string) => {
-    console.log(id);
-    // setListTodo(
-    //   listTodo.map((item) =>
-    //     item.id === id ? { ...item, isEdit: false } : item
-    //   )
-    // );
+    setEditingTodos((prev) => ({ ...prev, [id]: false }));
   };
 
   return (
@@ -90,12 +90,12 @@ function App() {
             <div key={item.id}>
               <div className="container">
                 <li onClick={() => editTodo(item.id)}>{item.title}</li>
-                <button onClick={() => completeTodo(item.id)}>完了</button>
+                <button onClick={() => completeTodo(item.id)}>削除</button>
               </div>
-              {item.isEdit && (
+              {editingTodos[item.id] && (
                 <EditTodo
                   todo={item}
-                  updateTodo={updateTodo}
+                  updateTodoDetails={updateTodoDetails}
                   cancelEdit={cancelEdit}
                 />
               )}

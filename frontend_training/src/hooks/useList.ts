@@ -13,5 +13,11 @@ async function fetcher(key: string) {
 
 export function useList() {
   const { data } = useSWR<jsonData>(API_URL, fetcher);
-  return data?.data;
+
+  const processedData = data?.data.map((todo) => ({
+    ...todo,
+    isEdit: false,
+  }));
+
+  return processedData;
 }
