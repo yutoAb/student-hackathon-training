@@ -4,6 +4,7 @@ import "./App.css";
 import { EditTodo } from "./EditTodo";
 import { useList } from "./hooks/useList";
 import { useCreateTodo } from "./hooks/useCreateTodo";
+import { useDeleteTodo } from "./hooks/useDeleteTodo";
 
 type name = `pending` | `completed` | `active`;
 
@@ -22,6 +23,7 @@ function App() {
 
   const listTodo = useList();
   const { createTodo } = useCreateTodo();
+  const { deleteTodo } = useDeleteTodo();
 
   const addTodo = async () => {
     if (todo.trim() !== "") {
@@ -34,13 +36,12 @@ function App() {
     }
   };
 
-  const completeTodo = (id: string) => {
-    console.log(id);
-    // setListTodo(
-    //   listTodo.map((item) =>
-    //     item.id === id ? { ...item, name: "completed" } : item
-    //   )
-    // );
+  const completeTodo = async (id: string) => {
+    try {
+      await deleteTodo(id);
+    } catch (error) {
+      console.error("Todo の削除に失敗しました", error);
+    }
   };
 
   const editTodo = (id: string) => {
