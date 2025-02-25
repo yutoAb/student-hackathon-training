@@ -4,6 +4,15 @@ declare(strict_types=1);
 
 header('Content-Type: application/json');
 
+$allowed_origins = [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173'
+];
+
+if (isset($_SERVER['HTTP_ORIGIN']) && in_array($_SERVER['HTTP_ORIGIN'], $allowed_origins, true)) {
+    header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+}
+
 // データベース接続情報
 $DB_CONFIG = [
     'host' => getenv('DB_HOST') ?: 'db',

@@ -1,59 +1,68 @@
 import { useState } from "react";
 import "./App.css";
-import { v4 as uuid } from "uuid";
 import { EditTodo } from "./EditTodo";
-
-export type Todo = {
-  id: string;
-  text: string;
-  isComplete: boolean;
-  isEdit: boolean;
-};
+import { useList } from "./hooks/useList";
+import { useCreateTodo } from "./hooks/useCreateTodo";
+import { useDeleteTodo } from "./hooks/useDeleteTodo";
+import { useUpdateTodo } from "./hooks/useUpdateTodo";
+import { convertNameToCompleted } from "./utils/convertNameToCompleted";
+import { name } from "./models/Todo";
+import { convertNameToJa } from "./utils/convertNameToCompleted";
 
 function App() {
-  const [listTodo, setListTodo] = useState<Todo[]>([]);
   const [todo, setTodo] = useState<string>("");
 
-  const addTodo = () => {
+  const listTodo = useList();
+  const { createTodo } = useCreateTodo();
+  const { deleteTodo } = useDeleteTodo();
+  const { updateTodo } = useUpdateTodo();
+
+  // 編集状態を管理する state
+  const [editingTodos, setEditingTodos] = useState<{ [key: string]: boolean }>(
+    {}
+  );
+
+  const addTodo = async () => {
     if (todo.trim() !== "") {
-      setListTodo([
-        ...listTodo,
-        { id: uuid(), text: todo, isComplete: false, isEdit: false },
-      ]);
-      setTodo("");
+      try {
+        await createTodo({ title: todo });
+        setTodo("");
+      } catch (error) {
+        console.error("Todo の作成に失敗しました", error);
+      }
     }
   };
 
-  const completeTodo = (id: string) => {
-    setListTodo(
-      listTodo.map((item) =>
-        item.id === id ? { ...item, isComplete: true } : item
-      )
-    );
+  const completeTodo = async (id: string) => {
+    try {
+      await deleteTodo(id);
+    } catch (error) {
+      console.error("Todo の削除に失敗しました", error);
+    }
   };
 
   const editTodo = (id: string) => {
-    setListTodo(
-      listTodo.map((item) =>
-        item.id === id ? { ...item, isEdit: true } : item
-      )
-    );
+    setEditingTodos((prev) => ({ ...prev, [id]: true }));
   };
 
-  const updateTodo = (id: string, newText: string) => {
-    setListTodo(
-      listTodo.map((item) =>
-        item.id === id ? { ...item, text: newText, isEdit: false } : item
-      )
-    );
+  const updateTodoDetails = async (
+    id: string,
+    newTitle: string,
+    newName: name
+  ) => {
+    try {
+      await updateTodo(id, {
+        title: newTitle,
+        completed: convertNameToCompleted(newName),
+      });
+      setEditingTodos((prev) => ({ ...prev, [id]: false }));
+    } catch (error) {
+      console.error("Todo の更新に失敗しました", error);
+    }
   };
 
   const cancelEdit = (id: string) => {
-    setListTodo(
-      listTodo.map((item) =>
-        item.id === id ? { ...item, isEdit: false } : item
-      )
-    );
+    setEditingTodos((prev) => ({ ...prev, [id]: false }));
   };
 
   return (
@@ -68,23 +77,23 @@ function App() {
         <button onClick={addTodo}>追加</button>
       </div>
       <ul>
-        {listTodo
-          .filter((item) => !item.isComplete)
-          .map((item) => (
-            <div key={item.id}>
-              <div className="container">
-                <li onClick={() => editTodo(item.id)}>{item.text}</li>
-                <button onClick={() => completeTodo(item.id)}>完了</button>
+        {listTodo?.map((item) => (
+          <div key={item.id}>
+            <div className="container">
+              <div className="container" onClick={() => editTodo(item.id)}>
+                <li>{item.title}</li>：<div>{convertNameToJa(item.name)}</div>
               </div>
-              {item.isEdit && (
-                <EditTodo
-                  todo={item}
-                  updateTodo={updateTodo}
-                  cancelEdit={cancelEdit}
-                />
-              )}
+              <button onClick={() => completeTodo(item.id)}>削除</button>
             </div>
-          ))}
+            {editingTodos[item.id] && (
+              <EditTodo
+                todo={item}
+                updateTodoDetails={updateTodoDetails}
+                cancelEdit={cancelEdit}
+              />
+            )}
+          </div>
+        ))}
       </ul>
     </>
   );
