@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./App.css";
-import { v4 as uuid } from "uuid";
+// import { v4 as uuid } from "uuid";
 import { EditTodo } from "./EditTodo";
 import { useList } from "./hooks/useList";
 
@@ -14,52 +14,57 @@ export type Todo = {
 };
 
 function App() {
-  const [listTodo, setListTodo] = useState<Todo[]>([]);
+  // const [listTodo, setListTodo] = useState<Todo[]>([]);
   const [todo, setTodo] = useState<string>("");
 
-  const list = useList();
-  console.log(list);
+  const listTodo = useList();
+  // console.log(list);
 
   const addTodo = () => {
     if (todo.trim() !== "") {
-      setListTodo([
-        ...listTodo,
-        { id: uuid(), title: todo, name: "pending", isEdit: false },
-      ]);
+      // setListTodo([
+      //   ...listTodo,
+      //   { id: uuid(), title: todo, name: "pending", isEdit: false },
+      // ]);
       setTodo("");
     }
   };
 
   const completeTodo = (id: string) => {
-    setListTodo(
-      listTodo.map((item) =>
-        item.id === id ? { ...item, name: "completed" } : item
-      )
-    );
+    console.log(id);
+    // setListTodo(
+    //   listTodo.map((item) =>
+    //     item.id === id ? { ...item, name: "completed" } : item
+    //   )
+    // );
   };
 
   const editTodo = (id: string) => {
-    setListTodo(
-      listTodo.map((item) =>
-        item.id === id ? { ...item, isEdit: true } : item
-      )
-    );
+    console.log(id);
+    // setListTodo(
+    //   listTodo.map((item) =>
+    //     item.id === id ? { ...item, isEdit: true } : item
+    //   )
+    // );
   };
 
   const updateTodo = (id: string, newTitle: string) => {
-    setListTodo(
-      listTodo.map((item) =>
-        item.id === id ? { ...item, title: newTitle, isEdit: false } : item
-      )
-    );
+    console.log(id);
+    console.log(newTitle);
+    // setListTodo(
+    //   listTodo.map((item) =>
+    //     item.id === id ? { ...item, title: newTitle, isEdit: false } : item
+    //   )
+    // );
   };
 
   const cancelEdit = (id: string) => {
-    setListTodo(
-      listTodo.map((item) =>
-        item.id === id ? { ...item, isEdit: false } : item
-      )
-    );
+    console.log(id);
+    // setListTodo(
+    //   listTodo.map((item) =>
+    //     item.id === id ? { ...item, isEdit: false } : item
+    //   )
+    // );
   };
 
   return (
@@ -75,7 +80,7 @@ function App() {
       </div>
       <ul>
         {listTodo
-          .filter((item) => item.name='completed')
+          ?.filter((item) => (item.name = "completed"))
           .map((item) => (
             <div key={item.id}>
               <div className="container">
