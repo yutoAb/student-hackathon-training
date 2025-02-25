@@ -20,7 +20,6 @@ export type Todo = {
 };
 
 function App() {
-  // const [listTodo, setListTodo] = useState<Todo[]>([]);
   const [todo, setTodo] = useState<string>("");
 
   const listTodo = useList();
