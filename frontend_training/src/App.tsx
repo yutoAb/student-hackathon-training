@@ -3,8 +3,11 @@ import "./App.css";
 // import { v4 as uuid } from "uuid";
 import { EditTodo } from "./EditTodo";
 import { useList } from "./hooks/useList";
+import { useCreateTodo } from "./hooks/useCreateTodo";
 
 type name = `pending` | `completed` | `active`;
+
+export const API_URL = "http://localhost/todos";
 
 export type Todo = {
   id: string;
@@ -18,15 +21,16 @@ function App() {
   const [todo, setTodo] = useState<string>("");
 
   const listTodo = useList();
-  // console.log(list);
+  const { createTodo } = useCreateTodo();
 
-  const addTodo = () => {
+  const addTodo = async () => {
     if (todo.trim() !== "") {
-      // setListTodo([
-      //   ...listTodo,
-      //   { id: uuid(), title: todo, name: "pending", isEdit: false },
-      // ]);
-      setTodo("");
+      try {
+        await createTodo({ title: todo });
+        setTodo("");
+      } catch (error) {
+        console.error("Todo の作成に失敗しました", error);
+      }
     }
   };
 
