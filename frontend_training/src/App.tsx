@@ -7,6 +7,7 @@ import { useDeleteTodo } from "./hooks/useDeleteTodo";
 import { useUpdateTodo } from "./hooks/useUpdateTodo";
 import { convertNameToCompleted } from "./utils/convertNameToCompleted";
 import { name } from "./models/Todo";
+import { convertNameToJa } from "./utils/convertNameToCompleted";
 
 function App() {
   const [todo, setTodo] = useState<string>("");
@@ -76,23 +77,22 @@ function App() {
         <button onClick={addTodo}>追加</button>
       </div>
       <ul>
-        {listTodo
-          ?.filter((item) => (item.name = "completed"))
-          .map((item) => (
-            <div key={item.id}>
-              <div className="container">
-                <li onClick={() => editTodo(item.id)}>{item.title}</li>
-                <button onClick={() => completeTodo(item.id)}>削除</button>
-              </div>
-              {editingTodos[item.id] && (
-                <EditTodo
-                  todo={item}
-                  updateTodoDetails={updateTodoDetails}
-                  cancelEdit={cancelEdit}
-                />
-              )}
+        {listTodo?.map((item) => (
+          <div key={item.id}>
+            <div className="container">
+              <li onClick={() => editTodo(item.id)}>{item.title}</li>
+              <div>{convertNameToJa(item.name)}</div>
+              <button onClick={() => completeTodo(item.id)}>削除</button>
             </div>
-          ))}
+            {editingTodos[item.id] && (
+              <EditTodo
+                todo={item}
+                updateTodoDetails={updateTodoDetails}
+                cancelEdit={cancelEdit}
+              />
+            )}
+          </div>
+        ))}
       </ul>
     </>
   );
