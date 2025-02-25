@@ -1,6 +1,5 @@
 import useSWR from "swr";
-import { Todo } from "../App";
-import { API_URL } from "../App";
+import { Todo, API_URL } from "../models/Todo";
 
 type jsonData = {
   status: string;

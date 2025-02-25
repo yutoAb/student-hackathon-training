@@ -1,6 +1,5 @@
 import { mutate } from "swr";
-import { API_URL } from "../App";
-import { Todo } from "../App";
+import { Todo, API_URL } from "../models/Todo";
 
 export function useCreateTodo() {
   async function createTodo(newTodo: Omit<Todo, "id" | "name" | "isEdit">) {

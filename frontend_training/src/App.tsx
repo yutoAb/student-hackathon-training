@@ -6,17 +6,7 @@ import { useCreateTodo } from "./hooks/useCreateTodo";
 import { useDeleteTodo } from "./hooks/useDeleteTodo";
 import { useUpdateTodo } from "./hooks/useUpdateTodo";
 import { convertNameToCompleted } from "./utils/convertNameToCompleted";
-
-export type name = `pending` | `completed` | `active`;
-
-export const API_URL = "http://localhost/todos";
-
-export type Todo = {
-  id: string;
-  title: string;
-  name: name;
-  isEdit: boolean;
-};
+import { name } from "./models/Todo";
 
 function App() {
   const [todo, setTodo] = useState<string>("");
@@ -54,7 +44,11 @@ function App() {
     setEditingTodos((prev) => ({ ...prev, [id]: true }));
   };
 
-  const updateTodoDetails = async (id: string, newTitle: string, name: name) => {
+  const updateTodoDetails = async (
+    id: string,
+    newTitle: string,
+    name: name
+  ) => {
     try {
       await updateTodo(id, {
         title: newTitle,

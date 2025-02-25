@@ -1,4 +1,4 @@
-import { name } from "../App";
+import { name } from "../models/Todo";
 
 export function convertNameToCompleted(name: name): string {
   switch (name) {

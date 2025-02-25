@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Todo } from "./App";
-import { name } from "./App";
+import { Todo, name } from "./models/Todo";
 
 type EditTodoProps = {
   todo: Todo;

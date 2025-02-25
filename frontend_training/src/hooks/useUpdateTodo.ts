@@ -1,5 +1,5 @@
 import { mutate } from "swr";
-import { API_URL } from "../App";
+import { API_URL } from "../models/Todo";
 
 export function useUpdateTodo() {
   async function updateTodo(
